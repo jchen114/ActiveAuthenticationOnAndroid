@@ -16,6 +16,7 @@ import android.util.Pair;
 import android.util.Range;
 import android.util.Rational;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -23,6 +24,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -46,10 +49,11 @@ public class CameraMetaSaver implements Runnable {
         try {
             mCaptureResult = captureResult;
             File parentDir = new File(SensorDataDumperActivity.mParentDir.getPath()
-                    + "/camera/meta");
+                    + "/" + Constants.META_DIR);
             if (!parentDir.exists()) {
                 parentDir.mkdir();
             }
+
             StringBuilder fileName = front ? new StringBuilder("front") : new StringBuilder("back");
             fileName.append("_" + Long.toString(timestamp.getTime()) + ".txt");
             /*
@@ -61,6 +65,17 @@ public class CameraMetaSaver implements Runnable {
             mFile = new File(parentDir, fileName.toString());
             mFile.createNewFile();
             mFileWriter = new FileWriter(mFile,false);
+            // Check if the window size has been reached
+            if (parentDir.listFiles().length > Constants.CAMERA_WINDOW_SIZE) {
+                File [] files = parentDir.listFiles();
+                File lastCreated = files[0];
+                for (File f : files) {
+                    if (f.lastModified() < lastCreated.lastModified()) {
+                        lastCreated = f;
+                    }
+                }
+                lastCreated.delete();
+            }
         } catch (IOException e) {
             Log.i(mLogTag, "IOException");
             e.printStackTrace();

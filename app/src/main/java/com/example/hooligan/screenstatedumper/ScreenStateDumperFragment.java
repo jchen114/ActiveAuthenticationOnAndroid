@@ -46,7 +46,7 @@ public class ScreenStateDumperFragment extends Fragment implements ScreenStateFr
         if (isDumping) {
             mDumpScreenButton.setText("Stop Dumping Screen State");
         } else {
-            mDumpScreenButton.setText("Start Dumping Screenn State");
+            mDumpScreenButton.setText("Start Dumping Screen State");
         }
     }
 

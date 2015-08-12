@@ -7,6 +7,7 @@ import android.hardware.SensorManager;
 import android.os.Looper;
 import android.util.Log;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 
 /**
@@ -19,10 +20,10 @@ public class TemperatureDataRunnable extends Thread implements SensorEventListen
     private DataToFileWriter mDataToFileWriter;
     private String mLogTag = "TemperatureRunnable";
 
+    private int mSamplingCounter = 0;
+
     public TemperatureDataRunnable(SensorManager sensorManager) throws NullPointerException {
         Log.i(mLogTag, "Runnable create");
-        mDataToFileWriter = new DataToFileWriter("Temperature.txt");
-        mDataToFileWriter.writeToFile("Time, Value in C", false);
         mSensorManager = sensorManager;
         mTemperatureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
         if (mTemperatureSensor == null) {
@@ -33,7 +34,7 @@ public class TemperatureDataRunnable extends Thread implements SensorEventListen
     @Override
     public void run() {
         Looper.prepare();
-        mSensorManager.registerListener(this, mTemperatureSensor, 2000000);
+        mSensorManager.registerListener(this, mTemperatureSensor, Constants.TEMPERATURE_SENSOR_SAMPLING_RATE);
         Looper.loop();
     }
 
@@ -48,14 +49,22 @@ public class TemperatureDataRunnable extends Thread implements SensorEventListen
 
     public void stopDumping() {
         mSensorManager.unregisterListener(this);
-        mDataToFileWriter.closeFile();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Float temp = event.values[0];
-        String toDump = Float.toString(temp);
-        Log.i(mLogTag, toDump);
-        mDataToFileWriter.writeToFile(toDump);
+
+        if (mSamplingCounter % Constants.TEMPERATURE_SENSOR_DOWNSAMPLING_RATE == 0) {
+            Float temp = event.values[0];
+            String toDump = Float.toString(temp);
+            Log.i(mLogTag, toDump);
+            mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.TEMPERATURE);
+            mDataToFileWriter.writeToFile("Time, Value in C", false);
+            mDataToFileWriter.writeToFile(toDump);
+            mDataToFileWriter.closeFile();
+        }
+
+        mSamplingCounter += 1;
+
     }
 }

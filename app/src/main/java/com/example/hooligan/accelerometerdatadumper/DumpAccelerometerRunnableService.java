@@ -32,8 +32,6 @@ public class DumpAccelerometerRunnableService extends Service {
         mAccDataDumperRunnable = new AccelerometerDataDumperRunnable((SensorManager)getSystemService(Context.SENSOR_SERVICE));
         mAccDataDumperRunnable.startDumping();
 
-        SensorDataDumperActivity.writeLogs(mLogTag + " Accelerometer starting");
-
         return START_STICKY;
     }
 
@@ -45,7 +43,6 @@ public class DumpAccelerometerRunnableService extends Service {
     @Override
     public void onDestroy() {
         mAccDataDumperRunnable.stopDumping();
-        SensorDataDumperActivity.writeLogs(mLogTag + " Accelerometer stopping");
         super.onDestroy();
     }
 }

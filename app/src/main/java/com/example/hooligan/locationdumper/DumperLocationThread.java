@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 import com.google.android.gms.common.ConnectionResult;
@@ -32,8 +33,6 @@ public class DumperLocationThread extends Thread
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private Location mCurrentLocation;
-    private String mUpdateTime;
     DataToFileWriter mDataToFileWriter;
     private static final String mLogTag = "DumperLocationThread";
 
@@ -50,7 +49,6 @@ public class DumperLocationThread extends Thread
     @Override
     public void run() {
         Looper.prepare();
-        mDataToFileWriter = new DataToFileWriter("Location.txt");
         buildGoogleApiClient();
         createLocationRequest();
         Looper.loop();
@@ -69,8 +67,8 @@ public class DumperLocationThread extends Thread
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(Constants.LOCATION_SAMPLING_RATE);
+        mLocationRequest.setFastestInterval(Constants.LOCATION_FASTEST_SAMPLING_RATE);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -78,7 +76,6 @@ public class DumperLocationThread extends Thread
     public void onConnected(Bundle bundle) {
         String toDump = "Connection successful";
         Log.i(mLogTag, toDump);
-        mDataToFileWriter.writeToFile("Time, Lat, Long, altitude, acc", false);
         startLocationUpdates();
     }
 
@@ -90,25 +87,27 @@ public class DumperLocationThread extends Thread
     public void onConnectionFailed(ConnectionResult connectionResult) {
         String toDump = "Failed to connect to google play: " + Integer.toString(connectionResult.getErrorCode());
         Log.e(mLogTag, toDump);
+        mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.LOCATION);
+        mDataToFileWriter.writeToFile("Time, Lat, Long, Altitude, Acc", false);
         mDataToFileWriter.writeToFile(toDump);
+        mDataToFileWriter.closeFile();
         GoogleApiAvailability.getInstance().getErrorDialog(SensorDataDumperActivity.mSensorDataDumperActivity, connectionResult.getErrorCode(),1).show();
-        stopDumping();
-        LocationDumperFragment.mLocationDumperFragment.connectionRefused();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         String toDump = "Suspended connection to google play: " + Integer.toString(i);
         Log.e(mLogTag, toDump);
+        mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.LOCATION);
+        mDataToFileWriter.writeToFile("Time, Lat, Long, Altitude, Acc", false);
         mDataToFileWriter.writeToFile(toDump);
+        mDataToFileWriter.closeFile();
     }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.i(mLogTag, "OnLocationChanged");
-        mCurrentLocation = location;
         float accuracy = location.getAccuracy();
-        mUpdateTime = DateFormat.getTimeInstance().format(new Date());
         String toDump = "";
         if (location.hasAltitude()) {
             toDump = Double.toString(location.getLatitude()) + ", "
@@ -122,7 +121,10 @@ public class DumperLocationThread extends Thread
                     + Float.toString(accuracy);
         }
         Log.i(mLogTag, toDump);
+        mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.LOCATION);
+        mDataToFileWriter.writeToFile("Time, Lat, Long, Altitude, Acc", false);
         mDataToFileWriter.writeToFile(toDump);
+        mDataToFileWriter.closeFile();
     }
 
     protected void stopLocationUpdates() {

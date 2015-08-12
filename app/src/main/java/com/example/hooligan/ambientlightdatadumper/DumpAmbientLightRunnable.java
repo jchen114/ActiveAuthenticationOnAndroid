@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.os.Looper;
 import android.util.Log;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -24,38 +25,20 @@ public class DumpAmbientLightRunnable extends Thread implements SensorEventListe
     private Sensor mLightSensor;
     private DataToFileWriter mDataToFileWriter;
 
-    private BroadcastReceiver mScreenOnReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-    };
-
-    private BroadcastReceiver mScreenOffReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-    };
+    private int mSamplingCounter = 0;
 
     private static final String mLogTag = "AmbientLightRunnable";
 
     public DumpAmbientLightRunnable(SensorManager sensorManager) {
         mSensorManager = sensorManager;
         mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        try {
-            mDataToFileWriter = new DataToFileWriter("Ambient-light.txt");
-            mDataToFileWriter.writeToFile("Time, Luminance, Screen Brightness", false);
-        }
-        catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
     public void run() {
         Looper.prepare();
-        mSensorManager.registerListener(this, mLightSensor, 3000000);
+        mSensorManager.registerListener(this, mLightSensor, Constants.AMBIENT_LIGHT_SENSOR_SAMPLING_RATE);
         Looper.loop();
     }
 
@@ -67,7 +50,6 @@ public class DumpAmbientLightRunnable extends Thread implements SensorEventListe
     public synchronized void stopDumping() {
         Log.i(mLogTag, "Stop dumping");
         mSensorManager.unregisterListener(this);
-        mDataToFileWriter.closeFile();
     }
 
     @Override
@@ -77,11 +59,25 @@ public class DumpAmbientLightRunnable extends Thread implements SensorEventListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        ContentResolver contentResolver = SensorDataDumperActivity.mSensorDataDumperActivity.getApplicationContext().getContentResolver();
-        int curBrightnessValue = android.provider.Settings.System.getInt(contentResolver, android.provider.Settings.System.SCREEN_BRIGHTNESS,-1);
-        float luminance = event.values[0];
-        String toDump = Float.toString(luminance) + " , " + Integer.toString(curBrightnessValue);
-        Log.i(mLogTag, toDump);
-        mDataToFileWriter.writeToFile(toDump);
+
+        if (mSamplingCounter % Constants.AMBIENT_LIGHT_SENSOR_DOWNSAMPLING_RATE == 0) {
+            ContentResolver contentResolver = SensorDataDumperActivity.mSensorDataDumperActivity.getApplicationContext().getContentResolver();
+            int curBrightnessValue = android.provider.Settings.System.getInt(contentResolver, android.provider.Settings.System.SCREEN_BRIGHTNESS,-1);
+            float luminance = event.values[0];
+            String toDump = Float.toString(luminance) + " , " + Integer.toString(curBrightnessValue);
+            Log.i(mLogTag, toDump);
+
+            try {
+                mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.AMBIENCE);
+                mDataToFileWriter.writeToFile("Time, Luminance, Screen Brightness", false);
+                mDataToFileWriter.writeToFile(toDump);
+                mDataToFileWriter.closeFile();
+            }
+            catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+
+        mSamplingCounter += 1;
     }
 }

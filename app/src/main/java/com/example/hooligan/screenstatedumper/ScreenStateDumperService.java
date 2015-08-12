@@ -18,14 +18,18 @@ public class ScreenStateDumperService extends Service {
     private BroadcastReceiver mScreenOnReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.SCREEN);
             mDataToFileWriter.writeToFile("On");
+            mDataToFileWriter.closeFile();
         }
     };
 
     private BroadcastReceiver mScreenOffReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.SCREEN);
             mDataToFileWriter.writeToFile("Off");
+            mDataToFileWriter.closeFile();
         }
     };
 
@@ -44,9 +48,10 @@ public class ScreenStateDumperService extends Service {
 
         Toast.makeText(getApplicationContext(), "Screen State service starting", Toast.LENGTH_SHORT).show();
 
-        mDataToFileWriter = new DataToFileWriter("Screen-state.txt");
+        mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.SCREEN);
         mDataToFileWriter.writeToFile("Time, State");
         mDataToFileWriter.writeToFile("On");
+        mDataToFileWriter.closeFile();
 
         IntentFilter screenOnFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         registerReceiver(mScreenOnReceiver, screenOnFilter);
@@ -62,7 +67,6 @@ public class ScreenStateDumperService extends Service {
         super.onDestroy();
         unregisterReceiver(mScreenOnReceiver);
         unregisterReceiver(mScreenOffReceiver);
-        mDataToFileWriter.closeFile();
     }
 
 }

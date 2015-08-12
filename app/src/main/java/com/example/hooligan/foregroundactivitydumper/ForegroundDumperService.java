@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -39,11 +40,11 @@ public class ForegroundDumperService extends Service {
         mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         mPackageManager = this.getPackageManager();
         Log.i(mLogTag, "Service is starting");
-        mDataToFileWriter = new DataToFileWriter("Foreground.txt");
-        mDataToFileWriter.writeToFile("Time, Background Apps", false);
         mTimerTask = new TimerTask() {
             @Override
             public void run() {
+                mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.FOREGROUND);
+                mDataToFileWriter.writeToFile("Time, Background Apps", false);
                 StringBuilder toDump = new StringBuilder();
                 List<ActivityManager.RunningAppProcessInfo> processes = mActivityManager.getRunningAppProcesses();
                 if (processes.size() > 0) {
@@ -58,11 +59,12 @@ public class ForegroundDumperService extends Service {
                     }
                     Log.i(mLogTag, toDump.toString());
                     mDataToFileWriter.writeToFile(toDump.toString());
+                    mDataToFileWriter.closeFile();
                 }
             }
         };
         mTimer = new Timer(mLogTag);
-        mTimer.schedule(mTimerTask, 0, 3000);
+        mTimer.schedule(mTimerTask, 0, Constants.FOREGROUND_SAMPLING_RATE);
         return START_STICKY;
     }
 
@@ -72,6 +74,5 @@ public class ForegroundDumperService extends Service {
         Log.i(mLogTag, "Stopping");
         mTimer.cancel();
         mTimer.purge();
-        mDataToFileWriter.closeFile();
     }
 }

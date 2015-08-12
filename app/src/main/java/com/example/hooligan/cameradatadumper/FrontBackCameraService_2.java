@@ -24,6 +24,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -170,7 +171,7 @@ public class FrontBackCameraService_2 extends Service {
             mWindowManager = SensorDataDumperActivity.mSensorDataDumperActivity.getWindowManager();
             mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             String dirPath = SensorDataDumperActivity.mParentDir.getPath()
-                    + "/camera";
+                    + "/" + Constants.CAMERA_DIR;
             mDir = new File(dirPath);
             if (!mDir.exists()) {
                 mDir.mkdir();
@@ -224,7 +225,7 @@ public class FrontBackCameraService_2 extends Service {
                 };
 
                 mTimer = new Timer(mLogTag);
-                mTimer.schedule(mTimerTask, 0, 7000);
+                mTimer.schedule(mTimerTask, 0, Constants.CAMERA_CAPTURE_RATE);
 
                 return START_STICKY;
             }
@@ -240,6 +241,20 @@ public class FrontBackCameraService_2 extends Service {
     }
 
     private void beginCapture() {
+
+        // Check to see if the window size is reached
+        if (mDir.listFiles().length > Constants.CAMERA_WINDOW_SIZE) {
+
+            File [] files = mDir.listFiles();
+            File lastCreated = files[0];
+            for (File f : files) {
+                if (f.lastModified() < lastCreated.lastModified()) {
+                    lastCreated = f;
+                }
+            }
+            lastCreated.delete();
+        }
+
 
         StringBuilder fileName;
         fileName = mUsingFrontCamera ?
@@ -313,8 +328,10 @@ public class FrontBackCameraService_2 extends Service {
                                                TotalCaptureResult result) {
                     Log.i(mLogTag, "File written to: " + mFile.getPath());
                     closeCamera();
-                    Thread cameraMetaSaver = new Thread(new CameraMetaSaver(result, mUsingFrontCamera, mTimeStamp, mFile.getPath()));
-                    cameraMetaSaver.start();
+                    if (mFile != null) {
+                        Thread cameraMetaSaver = new Thread(new CameraMetaSaver(result, mUsingFrontCamera, mTimeStamp, mFile.getPath()));
+                        cameraMetaSaver.start();
+                    }
                     mUsingFrontCamera = !mUsingFrontCamera;
                 }
             };

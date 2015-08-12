@@ -150,6 +150,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+        <service
+            android:name=".ScoringService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

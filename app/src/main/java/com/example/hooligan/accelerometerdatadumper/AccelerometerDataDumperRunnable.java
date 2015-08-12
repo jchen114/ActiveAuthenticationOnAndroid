@@ -1,20 +1,15 @@
 package com.example.hooligan.accelerometerdatadumper;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
-import com.example.hooligan.SensorDataDumperActivity;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -31,26 +26,20 @@ public class AccelerometerDataDumperRunnable extends Thread implements SensorEve
     private double[] linear_acceleration = new double[3];
 
     public DataToFileWriter mDataWriter;
-    private static final int DUMPING = 0;
-    private static final int STOP = 1;
+
+    private int mSamplingCounter = 0;
 
     private final static String mLogTag = "AccelerometerRunnable";
 
     public AccelerometerDataDumperRunnable(SensorManager sensorManager) {
         mSensorManager = sensorManager;
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        try {
-            mDataWriter = new DataToFileWriter("Accelerometer.txt");
-            mDataWriter.writeToFile("Time, X, Y, Z", false);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void run() {
         Looper.prepare();
-        mSensorManager.registerListener(this,mAccelerometer,2000000);
+        mSensorManager.registerListener(this,mAccelerometer, Constants.ACCELEROMETER_SENSOR_SAMPLING_RATE);
         Looper.loop();
     }
 
@@ -60,11 +49,6 @@ public class AccelerometerDataDumperRunnable extends Thread implements SensorEve
 
     public synchronized void stopDumping() {
         mSensorManager.unregisterListener(this);
-        if (mDataWriter.closeFile()) {
-            Log.i(mLogTag, "File closed");
-        } else {
-            Log.i(mLogTag, "File closing error");
-        }
     }
 
     @Override
@@ -75,20 +59,33 @@ public class AccelerometerDataDumperRunnable extends Thread implements SensorEve
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        final double alpha = 0.8;
-        // Isolate the force of gravity with the low-pass filter.
-        gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-        gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-        gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
-        // Remove the gravity contribution with the high-pass filter.
-        linear_acceleration[0] = event.values[0] - gravity[0];
-        linear_acceleration[1] = event.values[1] - gravity[1];
-        linear_acceleration[2] = event.values[2] - gravity[2];
-        String toDump = String.format("%f, %f, %f", linear_acceleration[0], linear_acceleration[1], linear_acceleration[2]);
-        Log.i(mLogTag, toDump);
-        mDataWriter.writeToFile(toDump);
+        if (mSamplingCounter % Constants.ACCELEROMETER_SENSOR_DOWNSAMPLING_RATE == 0) {
+
+            final double alpha = 0.8;
+            // Isolate the force of gravity with the low-pass filter.
+            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
+            // Remove the gravity contribution with the high-pass filter.
+            linear_acceleration[0] = event.values[0] - gravity[0];
+            linear_acceleration[1] = event.values[1] - gravity[1];
+            linear_acceleration[2] = event.values[2] - gravity[2];
+            String toDump = String.format("%f, %f, %f", linear_acceleration[0], linear_acceleration[1], linear_acceleration[2]);
+            Log.i(mLogTag, toDump);
+
+            try {
+                mDataWriter = new DataToFileWriter(DataToFileWriter.MODALITY.ACCELEROMETER);
+                mDataWriter.writeToFile("Time, X, Y, Z", false);
+                mDataWriter.writeToFile(toDump);
+                mDataWriter.closeFile();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+
+        mSamplingCounter += 1;
+
     }
-
-
 }

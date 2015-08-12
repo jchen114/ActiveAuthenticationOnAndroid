@@ -31,9 +31,10 @@ public class CallStateMonitorService extends Service {
         Toast.makeText(getApplicationContext(), "Call state starting", Toast.LENGTH_SHORT).show();
         IntentFilter filterCall = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
         registerReceiver(mPhoneStateBroadcastReceiver, filterCall);
-        mDataToFileWriter = new DataToFileWriter("Call-state.txt");
+        mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.CALL);
         mDataToFileWriter.writeToFile("Time, State", false);
         mDataToFileWriter.writeToFile("Idle");
+        mDataToFileWriter.closeFile();
         return START_STICKY;
     }
 
@@ -41,7 +42,6 @@ public class CallStateMonitorService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mPhoneStateBroadcastReceiver);
-        mDataToFileWriter.closeFile();
     }
 
     public CallStateMonitorService() {
@@ -72,20 +72,29 @@ public class CallStateMonitorService extends Service {
                     //when Idle i.e no call
                     //Toast.makeText(context, "Phone state Idle", Toast.LENGTH_SHORT).show();
                     Log.i(mLogTag, "Idle");
+                    mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.CALL);
+                    mDataToFileWriter.writeToFile("Time, State", false);
                     mDataToFileWriter.writeToFile("Idle");
+                    mDataToFileWriter.closeFile();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     //when Off hook i.e in call
                     //Make intent and start your service here
                     //Toast.makeText(context, "Phone state Off hook", Toast.LENGTH_SHORT).show();
+                    mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.CALL);
+                    mDataToFileWriter.writeToFile("Time, State", false);
                     mDataToFileWriter.writeToFile("In call");
                     Log.i(mLogTag, "In call");
+                    mDataToFileWriter.closeFile();
                     break;
                 case TelephonyManager.CALL_STATE_RINGING:
                     //when Ringing
                     //Toast.makeText(context, "Phone state Ringing", Toast.LENGTH_SHORT).show();
                     Log.i(mLogTag, "Ringing");
+                    mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.CALL);
+                    mDataToFileWriter.writeToFile("Time, State", false);
                     mDataToFileWriter.writeToFile("Ringing");
+                    mDataToFileWriter.closeFile();
                     break;
                 default:
                     break;

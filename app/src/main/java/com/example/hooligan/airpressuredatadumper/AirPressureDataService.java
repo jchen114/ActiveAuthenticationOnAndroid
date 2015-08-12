@@ -23,7 +23,6 @@ public class AirPressureDataService extends Service {
             mAirPressureDataRunnable = new AirPressureDataRunnable((SensorManager) getSystemService(SENSOR_SERVICE));
             mAirPressureDataRunnable.startDumping();
             Toast.makeText(this, "Air Pressure Dump Service Starting",Toast.LENGTH_SHORT).show();
-            SensorDataDumperActivity.writeLogs(mLogTag + " Starting");
             return START_STICKY;
         } catch (NullPointerException e) {
             Toast.makeText(this, "No Pressure Sensor",Toast.LENGTH_SHORT).show();
@@ -35,7 +34,6 @@ public class AirPressureDataService extends Service {
 
     @Override
     public void onDestroy() {
-        SensorDataDumperActivity.writeLogs(mLogTag + " Stopping");
         if (mAirPressureDataRunnable != null) {
             mAirPressureDataRunnable.stopDumping();
         }

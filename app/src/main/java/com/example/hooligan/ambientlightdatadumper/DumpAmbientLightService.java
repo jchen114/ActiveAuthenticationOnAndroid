@@ -19,7 +19,6 @@ public class DumpAmbientLightService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(mLogTag, "Start Dumping Ambient data");
         Toast.makeText(this, "Ambient Light Dumper Service Starting", Toast.LENGTH_SHORT).show();
-        SensorDataDumperActivity.writeLogs(mLogTag + " Starting");
         mAmbientLightDumperRunnable = new DumpAmbientLightRunnable((SensorManager) getSystemService(SENSOR_SERVICE));
         mAmbientLightDumperRunnable.startDumping();
         return START_STICKY;
@@ -33,7 +32,6 @@ public class DumpAmbientLightService extends Service {
     @Override
     public void onDestroy() {
         mAmbientLightDumperRunnable.stopDumping();
-        SensorDataDumperActivity.writeLogs(mLogTag + " Stopping");
         super.onDestroy();
     }
 

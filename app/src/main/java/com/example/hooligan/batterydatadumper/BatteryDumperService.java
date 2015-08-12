@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -34,22 +35,22 @@ public class BatteryDumperService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SensorDataDumperActivity.writeLogs(mLogTag + " Starting");
         Toast.makeText(this, "Battery Dumper Service Starting", Toast.LENGTH_SHORT).show();
         batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        mDataToFileWriter = new DataToFileWriter("Battery-Level.txt");
-        mDataToFileWriter.writeToFile("Time, Level", false);
         mTimerTask = new TimerTask() {
             @Override
             public void run() {
                 float level = getBatteryLevel();
                 String toDump = Float.toString(level);
                 Log.i(mLogTag, toDump);
+                mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.BATTERY);
+                mDataToFileWriter.writeToFile("Time, Level", false);
                 mDataToFileWriter.writeToFile(toDump);
+                mDataToFileWriter.closeFile();
             }
         };
         mTimer = new Timer(mLogTag);
-        mTimer.schedule(mTimerTask, 0, 3000);
+        mTimer.schedule(mTimerTask, 0, Constants.BATTERY_LEVEL_SAMPLING_RATE);
 
         return START_STICKY;
     }
@@ -71,9 +72,7 @@ public class BatteryDumperService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SensorDataDumperActivity.writeLogs(mLogTag + " Stopping");
         Log.i(mLogTag, "onDestroy");
         mTimer.cancel();
-        mDataToFileWriter.closeFile();
     }
 }

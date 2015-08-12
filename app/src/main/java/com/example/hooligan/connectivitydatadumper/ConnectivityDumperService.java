@@ -33,6 +33,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -102,9 +103,10 @@ public class ConnectivityDumperService extends Service {
             }
 
             //Log.i(mBTLogTag, blueToothToDump.toString());
-
+            mDataToFileWriterBluetooth = new DataToFileWriter(DataToFileWriter.MODALITY.BLUETOOTH);
+            mDataToFileWriterBluetooth.writeToFile("Time, Own, Currently Bonded, Previously Bonded, Ambient", false);
             mDataToFileWriterBluetooth.writeToFile(blueToothToDump.toString());
-
+            mDataToFileWriterBluetooth.closeFile();
             mBTScanning = false;
         }
     };
@@ -140,18 +142,9 @@ public class ConnectivityDumperService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "Connectivity Dumper Service Starting", Toast.LENGTH_SHORT).show();
-        try {
-            mDataToFileWriterWifi = new DataToFileWriter("Wifi.txt");
-            mDataToFileWriterBluetooth = new DataToFileWriter("Bluetooth.txt");
-            mDataToFileWriterCell = new DataToFileWriter("CellTower.txt");
 
-            mDataToFileWriterWifi.writeToFile("Time, Current_SSID | Current_BSSID | Current_RSSI, Ambient_SSID | Ambient_BSSID | Ambient_RSSI", false);
-            mDataToFileWriterBluetooth.writeToFile("Time, Own, Currently Bonded, Previously Bonded, Ambient", false);
-            mDataToFileWriterCell.writeToFile("Time, Type | Network Code | Country Code | Network Name | Signal Strength | Cell Identity | Physical Cell ID | Tracking Area Code", false);
-        } catch (java.lang.NullPointerException e) {
-            e.printStackTrace();
-        }
+        Toast.makeText(this, "Connectivity Dumper Service Starting", Toast.LENGTH_SHORT).show();
+
         mConnectionManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // Register the BroadcastReceiver
@@ -173,6 +166,11 @@ public class ConnectivityDumperService extends Service {
         mTimerTask = new TimerTask() {
             @Override
             public void run() {
+
+                mDataToFileWriterWifi = new DataToFileWriter(DataToFileWriter.MODALITY.WIFI);
+                mDataToFileWriterWifi.writeToFile("Time, Current_SSID | Current_BSSID | Current_RSSI, Ambient_SSID | Ambient_BSSID | Ambient_RSSI", false);
+                mDataToFileWriterCell = new DataToFileWriter(DataToFileWriter.MODALITY.CELLULAR);
+                mDataToFileWriterCell.writeToFile("Time, Type | Network Code | Country Code | Network Name | Signal Strength | Cell Identity | Physical Cell ID | Tracking Area Code", false);
 
                 // Information about wifi
                 mWifi = mConnectionManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -196,30 +194,38 @@ public class ConnectivityDumperService extends Service {
                     Log.i(mLogTag, "Mobile is connected");
                     mobileConnected();
                 }
-
                 cellularData();
+                mDataToFileWriterWifi.closeFile();
+                mDataToFileWriterCell.closeFile();
             }
         };
         mTimer = new Timer("Connectivity Timer");
-        mTimer.schedule(mTimerTask, 0, 5000); /// Wifi and Cellular
+        mTimer.schedule(mTimerTask, 0, Constants.WIFI_CELLULAR_SAMPLING_RATE); /// Wifi and Cellular
 
         mTimerTaskBT = new TimerTask() {
             @Override
             public void run() {
                 // Time, Own, Paired, Ambient
+
                 mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
                 if (mBluetoothAdapter == null) { // Device does not support bluetooth.
                     blueToothToDump = new StringBuilder();
                     Log.i(mBTLogTag, "Device does not support bluetooth");
                     blueToothToDump.append("0, 0, 0");
+                    mDataToFileWriterBluetooth = new DataToFileWriter(DataToFileWriter.MODALITY.BLUETOOTH);
+                    mDataToFileWriterBluetooth.writeToFile("Time, Own, Currently Bonded, Previously Bonded, Ambient", false);
                     mDataToFileWriterBluetooth.writeToFile(blueToothToDump.toString());
+                    mDataToFileWriterBluetooth.closeFile();
                 } else {
                     if (!mBluetoothAdapter.isEnabled()) { // Bluetooth not enabled
                         blueToothToDump = new StringBuilder();
                         Log.i(mBTLogTag, "Bluetooth not enabled");
                         blueToothToDump.append("0, -, -");
+                        mDataToFileWriterBluetooth = new DataToFileWriter(DataToFileWriter.MODALITY.BLUETOOTH);
+                        mDataToFileWriterBluetooth.writeToFile("Time, Own, Currently Bonded, Previously Bonded, Ambient", false);
                         mDataToFileWriterBluetooth.writeToFile(blueToothToDump.toString());
+                        mDataToFileWriterBluetooth.closeFile();
                     } else {
                         if (!mBTScanning) {
                             blueToothToDump = new StringBuilder();
@@ -242,7 +248,7 @@ public class ConnectivityDumperService extends Service {
         };
 
         mTimerBT = new Timer("Bluetooth Timer");
-        mTimerBT.schedule(mTimerTaskBT, 0, 5000);
+        mTimerBT.schedule(mTimerTaskBT, 0, Constants.BLUETOOTH_SAMPLING_RATE);
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -501,7 +507,9 @@ public class ConnectivityDumperService extends Service {
                     }
                 }
                 Log.i(mCellLogTag, cellularToDump.toString());
+
                 mDataToFileWriterCell.writeToFile(cellularToDump.toString());
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -519,8 +527,5 @@ public class ConnectivityDumperService extends Service {
         unregisterReceiver(mFinishedReceiver);
         unregisterReceiver(mConnectedReceiver);
         unregisterReceiver(mDisconnectedReceiver);
-        mDataToFileWriterWifi.closeFile();
-        mDataToFileWriterBluetooth.closeFile();
-        mDataToFileWriterCell.closeFile();
     }
 }

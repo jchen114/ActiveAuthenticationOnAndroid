@@ -2,6 +2,7 @@ package com.example.hooligan;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -96,7 +97,39 @@ public class SensorDataDumperActivity
     private TimerTask mUploadTimerTask;
     public Handler mHandler;
 
-    private static Integer timePeriod = 1000 * 60 * 60;
+    Intent mScoringService;
+    private Switch mToggleServices;
+
+    // Disabling Amazon AWS uploading for this application
+    private CompoundButton.OnCheckedChangeListener mChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+            if (didEnterName) {
+                if (isChecked) {
+                    makeDir();
+                    startScoringService();
+                    turnOnServices();
+                } else {
+                    stopScoringService();
+                    turnOffServices();
+                    mParentDir = null;
+
+                }
+            } else {
+                displayAngryDialog();
+                buttonView.setChecked(false);
+            }
+        }
+    };
+
+    private void startScoringService() {
+        mScoringService = new Intent(getApplicationContext(), ScoringService.class);
+        startService(mScoringService);
+    }
+
+    private void stopScoringService() {
+        stopService(mScoringService);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +178,7 @@ public class SensorDataDumperActivity
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
-                if (actionId == EditorInfo.IME_ACTION_DONE ) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
                     Log.i(mLogTag, "Done");
                     // the user is done typing.
                     didEnterName = true;
@@ -156,59 +189,12 @@ public class SensorDataDumperActivity
             }
         });
 
-        Switch toggleServices = (Switch) findViewById(R.id.toggle_services);
+        mToggleServices = (Switch) findViewById(R.id.toggle_services);
 
         mSensorDataDumperActivity = this;
         mHandler = new Handler(getMainLooper());
 
-        toggleServices.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
-                if (didEnterName) {
-                    if (isChecked) {
-                        makeDir();
-                        turnOnServices();
-                        mUploadTimerTask = new TimerTask() {
-                            @Override
-                            public void run() {
-                                if (buttonView.isChecked()) {
-                                    Log.i(mLogTag, "Upload timer task");
-                                    // Run some code on the main thread
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            turnOffServices();
-                                            uploadToAWS();
-                                            // Make a delay a little bit so that everything can shut off nicely
-                                            mHandler.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    makeDir();
-                                                    turnOnServices();
-                                                }
-                                            }, 2000);
-                                        }
-                                    });
-                                }
-                            }
-                        };
-                        mUploadTimer = new Timer("Upload Timer");
-                        mUploadTimer.schedule(mUploadTimerTask, timePeriod, timePeriod);
-                    } else {
-                        turnOffServices();
-                        uploadToAWS();
-                        mUploadTimer.cancel();
-                        mUploadTimer.purge();
-                        mParentDir = null;
-                    }
-                } else {
-                    displayAngryDialog();
-                    buttonView.setChecked(false);
-                }
-            }
-        });
-
-        setupAWS();
+        mToggleServices.setOnCheckedChangeListener(mChangeListener);
 
     }
 
@@ -393,6 +379,10 @@ public class SensorDataDumperActivity
 
         if (mParentDir == null) {
             makeDir();
+            mToggleServices.setOnCheckedChangeListener(null);
+            mToggleServices.setChecked(true);
+            mToggleServices.setOnCheckedChangeListener(mChangeListener);
+            startScoringService();
         }
 
         final int id = v.getId();
@@ -460,13 +450,6 @@ public class SensorDataDumperActivity
                 .setTitle("Must input a name")
                 .setMessage("Input a name in order to begin collecting data")
                 .setCancelable(true).show();
-    }
-
-    public static synchronized  void writeLogs(String log) {
-        if (mDataToFileWriter == null) {
-            mDataToFileWriter = new DataToFileWriter("logFile.txt");
-        }
-        mDataToFileWriter.writeToFile(log);
     }
 
 }

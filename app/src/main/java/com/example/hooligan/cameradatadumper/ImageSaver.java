@@ -77,6 +77,8 @@ public class ImageSaver implements Runnable {
             if (null != output) {
                 try {
                     output.close();
+                    // See how many pictures are in the directory.
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

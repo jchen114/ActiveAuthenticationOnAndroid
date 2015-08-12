@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.example.hooligan.Constants;
 import com.example.hooligan.DataToFileWriter;
 import com.example.hooligan.SensorDataDumperActivity;
 
@@ -25,6 +26,8 @@ public class RotationDataDumperRunnable extends Thread implements SensorEventLis
     private Sensor mRotationSensor;
     private final float[] mRotationMatrix = new float[16];
 
+    private int mSamplingCounter = 0;
+
     private static final int DUMPING = 0;
     private static final int STOP = 1;
     private static final String mLogTag = "RotationRunnable";
@@ -33,26 +36,34 @@ public class RotationDataDumperRunnable extends Thread implements SensorEventLis
     public RotationDataDumperRunnable(SensorManager sensorManager) {
         mSensorManager = sensorManager;
         mRotationSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        mDataToFileWriter = new DataToFileWriter("Rotation.txt");
-        mDataToFileWriter.writeToFile("Time, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16", false);
+
     }
 
     @Override
     public void run() {
         Looper.prepare();
-        mSensorManager.registerListener(this,mRotationSensor,2000000);
+        mSensorManager.registerListener(this,mRotationSensor, Constants.ROTATION_SENSOR_SAMPLING_RATE);
         Looper.loop();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-        StringBuilder toDump = new StringBuilder();
-        for (int i = 0; i < 16; i ++) {
-            toDump.append(Float.toString(mRotationMatrix[i]) + " | ");
+
+        if (mSamplingCounter % Constants.ROTATION_SENSOR_DOWNSAMPLING_RATE == 0) {
+            SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+            StringBuilder toDump = new StringBuilder();
+            for (int i = 0; i < 16; i ++) {
+                toDump.append(Float.toString(mRotationMatrix[i]) + " | ");
+            }
+            mDataToFileWriter = new DataToFileWriter(DataToFileWriter.MODALITY.ROTATION);
+            mDataToFileWriter.writeToFile("Time, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16", false);
+            mDataToFileWriter.writeToFile(toDump.toString());
+            mDataToFileWriter.closeFile();
+            Log.i(mLogTag, toDump.toString());
         }
-        mDataToFileWriter.writeToFile(toDump.toString());
-        Log.i(mLogTag, toDump.toString());
+
+        mSamplingCounter += 1;
+
     }
 
     @Override
@@ -70,6 +81,5 @@ public class RotationDataDumperRunnable extends Thread implements SensorEventLis
 
     public synchronized void stopDumping() {
         mSensorManager.unregisterListener(this);
-        mDataToFileWriter.closeFile();
     }
 }
