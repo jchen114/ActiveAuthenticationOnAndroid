@@ -14,9 +14,20 @@
         android:layout_height="wrap_content"
         android:text="@string/call_start"
         android:id="@+id/call_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/call_score"
+        android:layout_alignBottom="@+id/call_button"
+        android:layout_alignTop="@id/call_button"
+        android:layout_toEndOf="@+id/call_button"
+        android:inputType="number"
+        android:focusable="false"/>
 
 </RelativeLayout>

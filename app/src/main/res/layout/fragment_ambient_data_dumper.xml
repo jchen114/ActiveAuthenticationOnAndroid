@@ -13,7 +13,20 @@
         android:layout_height="wrap_content"
         android:text="@string/ambient_light_start"
         android:id="@+id/ambient_light_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/ambient_score"
+        android:layout_alignBottom="@+id/ambient_light_button"
+        android:layout_alignTop="@id/ambient_light_button"
+        android:layout_toEndOf="@+id/ambient_light_button"
+        android:inputType="number"
+        android:focusable="false"/>
+
 </RelativeLayout>

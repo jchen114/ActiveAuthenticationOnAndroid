@@ -155,6 +155,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".ViewCameraPicturesActivity"
+            android:label="@string/title_activity_view_camera_pictures" >
+        </activity>
     </application>
 
 </manifest>

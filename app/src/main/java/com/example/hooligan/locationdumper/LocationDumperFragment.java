@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 
@@ -106,5 +107,11 @@ public class LocationDumperFragment extends Fragment implements LocationDumperFr
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IS_DUMPING, isDumping);
+    }
+
+    @Override
+    public void setScore(int score) {
+        EditText locationScore = (EditText) getView().findViewById(R.id.location_score);
+        locationScore.setText(Integer.toString(score));
     }
 }

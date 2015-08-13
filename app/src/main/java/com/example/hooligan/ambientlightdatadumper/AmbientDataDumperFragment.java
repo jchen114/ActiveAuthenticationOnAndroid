@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 import com.example.hooligan.accelerometerdatadumper.DumpAccelerometerRunnableService;
@@ -84,4 +85,9 @@ public class AmbientDataDumperFragment extends Fragment implements AmbientLightF
         }
     }
 
+    @Override
+    public void setScore(int score) {
+        EditText ambientScore = (EditText) getView().findViewById(R.id.ambient_score);
+        ambientScore.setText(Integer.toString(score));
+    }
 }

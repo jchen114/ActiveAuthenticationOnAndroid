@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 
@@ -106,4 +107,21 @@ public class ConnectivityDumperFragment extends Fragment implements Connectivity
                 .setCancelable(true).show();
     }
 
+    @Override
+    public void setWifiScore(int score) {
+        EditText wifiScore = (EditText) getView().findViewById(R.id.wifi_score);
+        wifiScore.setText(Integer.toString(score));
+    }
+
+    @Override
+    public void setCellularScore(int score) {
+        EditText cellularScore = (EditText) getView().findViewById(R.id.cellular_score);
+        cellularScore.setText(Integer.toString(score));
+    }
+
+    @Override
+    public void setBluetoothScore(int score) {
+        EditText bluetoothScore = (EditText) getView().findViewById(R.id.bluetooth_score);
+        bluetoothScore.setText(Integer.toString(score));
+    }
 }

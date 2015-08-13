@@ -76,7 +76,7 @@ public class CameraMetaSaver implements Runnable {
                 }
                 lastCreated.delete();
             }
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             Log.i(mLogTag, "IOException");
             e.printStackTrace();
         }

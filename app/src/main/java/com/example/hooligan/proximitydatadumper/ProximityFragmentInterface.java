@@ -10,5 +10,5 @@ public interface ProximityFragmentInterface {
     void didPressProximityButton(View v);
     void turnOnService();
     void turnOffService();
-
+    void setScore(int score);
 }

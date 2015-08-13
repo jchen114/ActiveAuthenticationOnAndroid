@@ -10,5 +10,6 @@ public interface CallStateDataFragmentInterface {
     void didPressCallButton(View v);
     void turnOnService();
     void turnOffService();
+    void setScore(int score);
 
 }

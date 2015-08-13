@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 import com.example.hooligan.locationdumper.DumpLocationRunnableService;
@@ -81,5 +82,11 @@ public class ForegroundDumperFragment extends Fragment implements ForegroundFrag
             isDumping = false;
             setButtonText();
         }
+    }
+
+    @Override
+    public void setScore(int score) {
+        EditText foregroundScore = (EditText) getView().findViewById(R.id.foreground_score);
+        foregroundScore.setText(Integer.toString(score));
     }
 }

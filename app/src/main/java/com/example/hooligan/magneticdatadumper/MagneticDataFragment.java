@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 
@@ -87,4 +88,9 @@ public class MagneticDataFragment extends Fragment implements MagneticFragmentIn
         outState.putBoolean(KEY_IS_DUMPING, isDumping);
     }
 
+    @Override
+    public void setScore(int score) {
+        EditText magneticScore = (EditText) getView().findViewById(R.id.magnetic_score);
+        magneticScore.setText(Integer.toString(score));
+    }
 }

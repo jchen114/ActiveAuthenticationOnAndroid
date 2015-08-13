@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 import com.example.hooligan.temperaturedatadumper.TemperatureDataRunnableService;
@@ -86,5 +87,11 @@ public class ProximityDataDumperFragment extends Fragment implements ProximityFr
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_IS_DUMPING, isDumping);
+    }
+
+    @Override
+    public void setScore(int score) {
+        EditText proximityScore = (EditText) getView().findViewById(R.id.proximity_score);
+        proximityScore.setText(Integer.toString(score));
     }
 }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 
@@ -85,5 +86,10 @@ public class BatteryDumperFragment extends Fragment implements BatteryFragmentIn
             setButtonText();
         }
     }
-    
+
+    @Override
+    public void setScore(int score) {
+        EditText batteryScore = (EditText) getView().findViewById(R.id.battery_score);
+        batteryScore.setText(Integer.toString(score));
+    }
 }

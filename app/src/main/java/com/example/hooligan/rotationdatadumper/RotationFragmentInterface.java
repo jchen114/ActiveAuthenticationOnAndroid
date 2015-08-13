@@ -10,4 +10,5 @@ public interface RotationFragmentInterface {
     void didPressRotationButton(View v);
     void turnOnService();
     void turnOffService();
+    void setScore(int score);
 }

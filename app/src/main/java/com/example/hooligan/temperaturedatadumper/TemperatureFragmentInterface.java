@@ -10,5 +10,5 @@ public interface TemperatureFragmentInterface {
     void didPressTemperatureButton(View v);
     void turnOnService();
     void turnOffService();
-
+    void setScore(int score);
 }

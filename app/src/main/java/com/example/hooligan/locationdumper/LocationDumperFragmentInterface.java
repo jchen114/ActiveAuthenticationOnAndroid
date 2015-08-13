@@ -10,4 +10,5 @@ public interface LocationDumperFragmentInterface {
     void didPressLocationButton(View v);
     void turnOnService();
     void turnOffService();
+    void setScore(int score);
 }

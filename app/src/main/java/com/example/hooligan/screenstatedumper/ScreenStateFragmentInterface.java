@@ -10,5 +10,6 @@ public interface ScreenStateFragmentInterface {
     void didPressScreenButton(View v);
     void turnOnService();
     void turnOffService();
+    void setScore(int score);
 
 }

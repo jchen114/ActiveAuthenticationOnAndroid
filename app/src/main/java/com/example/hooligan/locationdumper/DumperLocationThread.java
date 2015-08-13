@@ -55,14 +55,18 @@ public class DumperLocationThread extends Thread
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(SensorDataDumperActivity.mSensorDataDumperActivity)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        String toDump = "Connecting client";
-        Log.i(mLogTag, toDump);
-        mGoogleApiClient.connect();
+        try {
+            mGoogleApiClient = new GoogleApiClient.Builder(SensorDataDumperActivity.mSensorDataDumperActivity)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            String toDump = "Connecting client";
+            Log.i(mLogTag, toDump);
+            mGoogleApiClient.connect();
+        } catch (NullPointerException e) {
+            Log.i(mLogTag, e.getMessage());
+        }
     }
 
     protected void createLocationRequest() {

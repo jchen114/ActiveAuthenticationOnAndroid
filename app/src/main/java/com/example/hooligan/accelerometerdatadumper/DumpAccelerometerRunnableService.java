@@ -45,4 +45,5 @@ public class DumpAccelerometerRunnableService extends Service {
         mAccDataDumperRunnable.stopDumping();
         super.onDestroy();
     }
+
 }

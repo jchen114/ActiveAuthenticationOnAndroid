@@ -10,4 +10,5 @@ public interface AmbientLightFragmentInterface {
     void turnOnService();
     void turnOffService();
     void didPressAmbientButton(View v);
+    void setScore(int score);
 }

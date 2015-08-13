@@ -12,8 +12,20 @@
         android:layout_height="wrap_content"
         android:text="@string/rotation_start"
         android:id="@+id/rotation_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/rotation_score"
+        android:layout_alignBottom="@+id/rotation_button"
+        android:layout_alignTop="@id/rotation_button"
+        android:layout_toEndOf="@+id/rotation_button"
+        android:inputType="number"
+        android:focusable="false"/>
 
 </RelativeLayout>

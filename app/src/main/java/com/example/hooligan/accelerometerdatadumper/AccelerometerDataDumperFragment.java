@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.hooligan.R;
 
@@ -94,5 +95,11 @@ public class AccelerometerDataDumperFragment extends Fragment implements Acceler
     public void onDestroy() {
         Log.i("AccDumperFragment", "OnDestroy");
         super.onDestroy();
+    }
+
+    @Override
+    public void setScore(int score) {
+        EditText accelScore = (EditText) getView().findViewById(R.id.accelerometer_score);
+        accelScore.setText(Integer.toString(score));
     }
 }

@@ -238,95 +238,6 @@ public class SensorDataDumperActivity
         screen_fragment.turnOffService();
     }
 
-    private void setupAWS() {
-        mCredentialsProvider = new CognitoCachingCredentialsProvider(
-                this.getApplicationContext(), // Context
-                "us-east-1:598b05c6-be01-42e5-8fb2-2a18a0d9b673", // Identity Pool ID
-                Regions.US_EAST_1 // Region
-        );
-
-        mTransferManager = new TransferManager(mCredentialsProvider);
-    }
-
-    private void uploadToAWS() {
-
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        if (mWifi.isConnected()) {
-            try {
-                Log.i(mLogTag, "Uploading to AWS");
-                Toast.makeText(this, "Uploading to AWS", Toast.LENGTH_SHORT).show();
-                mQueuedFiles.add(mParentDir);
-                Log.i(mLogTag, "QueuedFiles length: " + Integer.toString(mQueuedFiles.size()));
-                for (final File toUpload : mQueuedFiles) {
-                    Log.i(mLogTag, "toUpload: " + toUpload.getName());
-                    final MultipleFileUpload upload = mTransferManager.uploadDirectory(mBucketName, toUpload.getName(), toUpload, true);
-                    upload.addProgressListener(new ProgressListener() {
-                        @Override
-                        public void progressChanged(ProgressEvent progressEvent) {
-
-                            if (upload.isDone()) {
-                                try {
-                                    Log.i(mLogTag, "Completed transfer");
-                                    // Delete the file
-                                    if(deleteRecursively(toUpload)) {
-                                        Log.i(mLogTag, "Successfully deleted");
-                                    } else {
-                                        Log.i(mLogTag, "Failed to delete");
-                                    }
-                                    mQueuedFiles.remove(toUpload);
-                                    Log.i(mLogTag, "Queued Files length:" + Integer.toString(mQueuedFiles.size()));
-                                } catch (SecurityException e) {
-                                    Log.i(mLogTag, "Security Exception on file delete: " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }
-
-                        }
-                    });
-                }
-
-            } catch (AmazonServiceException e) {
-                Log.i(mLogTag, "Amazon Service Exception: " + e.getErrorMessage());
-            } catch (AmazonClientException e) {
-                Log.i(mLogTag, "Amazon Client Exception: " + e.getMessage());
-            }
-        } else {
-            // Add the directory to the queue to be uploaded
-            mQueuedFiles.add(mParentDir);
-        }
-    }
-
-    private boolean deleteRecursively(File dir)
-    {
-        //Log.d(mLogTag, "DELETEPREVIOUS TOP" + dir.getPath());
-        boolean result = true;
-        if (dir.isDirectory())
-        {
-            String[] children = dir.list();
-
-            for (String child : children) {
-                File temp = new File(dir,child);
-
-                if (temp.isDirectory())
-                {
-                    Log.d(mLogTag, "Recursive Call" + temp.getPath());
-                    result = result && deleteRecursively(temp);
-                }
-                else
-                {
-                    Log.d(mLogTag, "Delete File" + temp.getPath());
-                    result = result && temp.delete();
-                }
-
-            }
-        }
-
-        return result && dir.delete();
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -399,6 +310,9 @@ public class SensorDataDumperActivity
             case R.id.cam_button:
                 cam_fragment.didPressCameraButton(v);
                 break;
+            case R.id.view_pictures_button:
+
+                break;
             case R.id.location_button:
                 loc_fragment.didPressLocationButton(v);
                 break;
@@ -419,6 +333,9 @@ public class SensorDataDumperActivity
                 break;
             case R.id.temperature_button:
                 temperature_fragment.didPressTemperatureButton(v);
+                break;
+            case R.id.screen_button:
+                screen_fragment.didPressScreenButton(v);
                 break;
             case R.id.air_button:
                 air_fragment.didPressAirPressureButton(v);
@@ -450,6 +367,143 @@ public class SensorDataDumperActivity
                 .setTitle("Must input a name")
                 .setMessage("Input a name in order to begin collecting data")
                 .setCancelable(true).show();
+    }
+
+    public void setAccelerometerScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                acc_fragment.setScore(ScoringService.ACCELEROMETER_SCORE.peekScore());
+            }
+        });
+
+    }
+
+    public void setAirPressureScore() {
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                air_fragment.setScore(ScoringService.AIR_PRESSURE_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setAmbientLightScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ambient_light_fragment.setScore(ScoringService.AMBIENT_LIGHT_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setBatteryLevelScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                battery_fragment.setScore(ScoringService.BATTERY_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setCallStateScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                call_fragment.setScore(ScoringService.CALL_STATE_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setWifiScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                conn_fragment.setWifiScore(ScoringService.WIFI_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setCellularScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                conn_fragment.setCellularScore(ScoringService.CELL_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setBluetoothScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                conn_fragment.setBluetoothScore(ScoringService.BLUETOOTH_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setForegroundScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                foreground_fragment.setScore(ScoringService.FOREGROUND_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setLocationScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                loc_fragment.setScore(ScoringService.LOCATION_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setMagneticScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                magnetic_fragment.setScore(ScoringService.MAGNETIC_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setProximityScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                proximity_fragment.setScore(ScoringService.PROXIMITY_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setRotationScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                rot_fragment.setScore(ScoringService.ROTATION_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setScreenScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                screen_fragment.setScore(ScoringService.SCREEN_SCORE.peekScore());
+            }
+        });
+    }
+
+    public void setTemperatureScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                temperature_fragment.setScore(ScoringService.TEMPERATURE_SCORE.peekScore());
+            }
+        });
     }
 
 }

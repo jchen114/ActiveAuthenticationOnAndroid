@@ -10,5 +10,5 @@ public interface MagneticFragmentInterface {
     void didPressMagneticButton(View v);
     void turnOnService();
     void turnOffService();
-
+    void setScore(int score);
 }

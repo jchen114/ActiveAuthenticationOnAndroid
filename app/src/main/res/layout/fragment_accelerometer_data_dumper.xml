@@ -14,7 +14,20 @@
         android:layout_height="wrap_content"
         android:text="@string/accelerometer_start"
         android:id="@+id/accel_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/accelerometer_score"
+        android:layout_alignBottom="@+id/accel_button"
+        android:layout_alignTop="@id/accel_button"
+        android:layout_toEndOf="@+id/accel_button"
+        android:inputType="number"
+        android:focusable="false" />
+
 </RelativeLayout>

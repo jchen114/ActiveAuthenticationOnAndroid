@@ -10,5 +10,6 @@ public interface AirPressureFragmentInterface {
     void didPressAirPressureButton(View v);
     void turnOnService();
     void turnOffService();
+    void setScore(int score);
 
 }

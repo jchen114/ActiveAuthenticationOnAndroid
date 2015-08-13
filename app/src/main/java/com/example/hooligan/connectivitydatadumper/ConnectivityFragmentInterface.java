@@ -11,5 +11,7 @@ public interface ConnectivityFragmentInterface {
     void turnOnService();
     void turnOffService();
     void didPressConnectivityButton(View v);
-
+    void setWifiScore(int score);
+    void setCellularScore(int score);
+    void setBluetoothScore(int score);
 }

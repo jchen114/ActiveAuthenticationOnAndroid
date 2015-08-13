@@ -12,8 +12,20 @@
         android:layout_height="wrap_content"
         android:text="@string/magnetic_start"
         android:id="@+id/magnetic_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/magnetic_score"
+        android:layout_alignBottom="@+id/magnetic_button"
+        android:layout_alignTop="@id/magnetic_button"
+        android:layout_toEndOf="@+id/magnetic_button"
+        android:inputType="number"
+        android:focusable="false"/>
 
 </RelativeLayout>

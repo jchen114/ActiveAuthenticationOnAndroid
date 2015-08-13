@@ -10,5 +10,6 @@ public interface BatteryFragmentInterface {
     void turnOnService();
     void turnOffService();
     void didPressBatteryButton(View v);
+    void setScore(int score);
 
 }

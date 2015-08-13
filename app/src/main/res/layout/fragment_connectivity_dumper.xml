@@ -14,8 +14,44 @@
         android:layout_height="wrap_content"
         android:text="@string/connectivity_start"
         android:id="@+id/connectivity_button"
+        android:onClick="onClick"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:onClick="onClick"/>
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/wifi_score"
+        android:layout_alignBottom="@+id/connectivity_button"
+        android:layout_alignTop="@id/connectivity_button"
+        android:layout_toEndOf="@+id/connectivity_button"
+        android:inputType="number"
+        android:focusable="false"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/cellular_score"
+        android:inputType="number"
+        android:layout_alignTop="@+id/wifi_score"
+        android:layout_alignBottom="@id/wifi_score"
+        android:layout_toEndOf="@+id/wifi_score"
+        android:focusable="false"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:id="@+id/bluetooth_score"
+        android:inputType="number"
+        android:layout_alignBottom="@+id/cellular_score"
+        android:layout_alignTop="@id/cellular_score"
+        android:layout_toEndOf="@+id/cellular_score"
+        android:focusable="false"/>
+
 </RelativeLayout>

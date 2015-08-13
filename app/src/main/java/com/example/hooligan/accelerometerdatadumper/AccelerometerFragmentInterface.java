@@ -10,5 +10,5 @@ public interface AccelerometerFragmentInterface {
     void turnOnService();
     void turnOffService();
     void didPressDumpAccelerometerButton(View v);
-
+    void setScore(int score);
 }
