@@ -1,10 +1,7 @@
 package com.example.hooligan;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -20,16 +17,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.event.ProgressEvent;
-import com.amazonaws.event.ProgressListener;
-import com.amazonaws.mobileconnectors.s3.transfermanager.MultipleFileUpload;
 import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
-import com.amazonaws.regions.Regions;
 import com.example.hooligan.accelerometerdatadumper.AccelerometerFragmentInterface;
 import com.example.hooligan.airpressuredatadumper.AirPressureFragmentInterface;
 import com.example.hooligan.ambientlightdatadumper.AmbientLightFragmentInterface;
@@ -40,7 +30,6 @@ import com.example.hooligan.connectivitydatadumper.ConnectivityFragmentInterface
 import com.example.hooligan.foregroundactivitydumper.ForegroundFragmentInterface;
 import com.example.hooligan.locationdumper.LocationDumperFragmentInterface;
 import com.example.hooligan.magneticdatadumper.MagneticFragmentInterface;
-import com.example.hooligan.microphonedumper.MicrophoneFragmentInterface;
 import com.example.hooligan.proximitydatadumper.ProximityFragmentInterface;
 import com.example.hooligan.rotationdatadumper.RotationFragmentInterface;
 import com.example.hooligan.screenstatedumper.ScreenStateFragmentInterface;
@@ -311,7 +300,8 @@ public class SensorDataDumperActivity
                 cam_fragment.didPressCameraButton(v);
                 break;
             case R.id.view_pictures_button:
-
+                Intent viewIntent = new Intent(this, ViewCameraPicturesActivity.class);
+                startActivity(viewIntent);
                 break;
             case R.id.location_button:
                 loc_fragment.didPressLocationButton(v);

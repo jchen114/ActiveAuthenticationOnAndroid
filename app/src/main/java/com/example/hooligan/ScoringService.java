@@ -7,8 +7,12 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.example.hooligan.cameradatadumper.ImageViewer;
+
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -398,12 +402,26 @@ public class ScoringService extends Service {
                     return pathname.isFile();
                 }
             });
+            File[] frontPictures = new File(SensorDataDumperActivity.mParentDir, Constants.CAMERA_DIR).listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String filename) {
+                    return filename.contains("front");
+                }
+            });
             File[] metaFiles = new File(SensorDataDumperActivity.mParentDir, Constants.META_DIR).listFiles();
             if (pictures.length > 0 && metaFiles.length > 0) {
                 // calculate scores here
                 CAMERA_SCORE.put(0);
                 Log.i(mLogTag, "Pictures files: " + Integer.toString(pictures.length));
                 Log.i(mLogTag, "Meta files: " + Integer.toString(metaFiles.length));
+                // send an image to show here
+                // Testing:
+                if (ViewCameraPicturesActivity.mSharedViewCameraPicturesActivity != null) {
+                    Arrays.sort(frontPictures);
+                    File file = frontPictures[frontPictures.length - 1];
+                    ImageViewer iv = new ImageViewer(file, 40, 20, 300, 300);
+                    ViewCameraPicturesActivity.mSharedViewCameraPicturesActivity.postImage(iv);
+                }
             } else {
                 CAMERA_SCORE.put(-1);
             }

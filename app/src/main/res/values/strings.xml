@@ -27,6 +27,6 @@
     <string name="stop_everything">Stop all services</string>
     <string name="title_activity_view_camera_pictures">ViewCameraPicturesActivity</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="front_camera_image_description">Displays most recent front image with bounding box</string>
 
 </resources>
