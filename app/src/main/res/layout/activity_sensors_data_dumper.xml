@@ -20,15 +20,35 @@
             android:id="@+id/name_text_field"
             android:hint="@string/enter_name"/>
 
-        <Switch
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textOn="@string/stop_everything"
-            android:textOff="@string/start_everything"
-            android:id="@+id/toggle_services"
+            android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
-            android:showText="true"
-            />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="@string/stop_everything"
+                android:textOff="@string/start_everything"
+                android:id="@+id/toggle_services"
+                android:layout_gravity="center_horizontal"
+                android:showText="true"
+                />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/cumulative_score"
+                android:layout_weight="1"
+                android:focusable="false"/>
+
+        </LinearLayout>
+
+
 
         <fragment
             xmlns:android="http://schemas.android.com/apk/res/android"

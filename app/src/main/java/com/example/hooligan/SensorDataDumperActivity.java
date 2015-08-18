@@ -496,4 +496,14 @@ public class SensorDataDumperActivity
         });
     }
 
+    public void setCumulativeScore() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                EditText cumulativeScore = (EditText) findViewById(R.id.cumulative_score);
+                cumulativeScore.setText(Integer.toString(ScoringService.CUMULATIVE_SCORE));
+            }
+        });
+    }
+
 }

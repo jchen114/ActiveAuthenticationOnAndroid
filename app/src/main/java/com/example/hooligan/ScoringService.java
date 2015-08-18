@@ -39,23 +39,25 @@ public class ScoringService extends Service {
     private Timer mCumulativeScoreTimer;
 
     // Sensors
-    public static FifoQueue ACCELEROMETER_SCORE = new FifoQueue(5);
-    public static FifoQueue AIR_PRESSURE_SCORE = new FifoQueue(5);
-    public static FifoQueue AMBIENT_LIGHT_SCORE = new FifoQueue(5);
-    public static FifoQueue MAGNETIC_SCORE = new FifoQueue(5);
-    public static FifoQueue PROXIMITY_SCORE = new FifoQueue(5);
-    public static FifoQueue ROTATION_SCORE = new FifoQueue(5);
-    public static FifoQueue TEMPERATURE_SCORE = new FifoQueue(5);
+    public static FifoQueue ACCELEROMETER_SCORE = new FifoQueue(Constants.ACCELEROMETER_SCORING_HISTORY);
+    public static FifoQueue AIR_PRESSURE_SCORE = new FifoQueue(Constants.AIR_PRESSURE_SCORING_HISTORY);
+    public static FifoQueue AMBIENT_LIGHT_SCORE = new FifoQueue(Constants.AMBIENT_LIGHT_SCORING_HISTORY);
+    public static FifoQueue MAGNETIC_SCORE = new FifoQueue(Constants.MAGNETIC_SCORING_HISTORY);
+    public static FifoQueue PROXIMITY_SCORE = new FifoQueue(Constants.PROXIMITY_SCORING_HISTORY);
+    public static FifoQueue ROTATION_SCORE = new FifoQueue(Constants.ROTATION_SCORING_HISTORY);
+    public static FifoQueue TEMPERATURE_SCORE = new FifoQueue(Constants.TEMPERATURE_SCORING_HISTORY);
     // Phone
-    public static FifoQueue BATTERY_SCORE = new FifoQueue(5);
-    public static FifoQueue CALL_STATE_SCORE = new FifoQueue(5);
-    public static FifoQueue CAMERA_SCORE = new FifoQueue(5);
-    public static FifoQueue WIFI_SCORE = new FifoQueue(5);
-    public static FifoQueue CELL_SCORE = new FifoQueue(5);
-    public static FifoQueue BLUETOOTH_SCORE = new FifoQueue(5);
-    public static FifoQueue FOREGROUND_SCORE = new FifoQueue(5);
-    public static FifoQueue LOCATION_SCORE = new FifoQueue(5);
-    public static FifoQueue SCREEN_SCORE = new FifoQueue(5);
+    public static FifoQueue BATTERY_SCORE = new FifoQueue(Constants.BATTERY_SCORING_HISTORY);
+    public static FifoQueue CALL_STATE_SCORE = new FifoQueue(Constants.CALL_SCORING_HISTORY);
+    public static FifoQueue CAMERA_SCORE = new FifoQueue(Constants.CAMERA_SCORING_HISTORY);
+    public static FifoQueue WIFI_SCORE = new FifoQueue(Constants.WIFI_SCORING_HISTORY);
+    public static FifoQueue CELL_SCORE = new FifoQueue(Constants.CELLULAR_SCORING_HISTORY);
+    public static FifoQueue BLUETOOTH_SCORE = new FifoQueue(Constants.BLUETOOTH_SCORING_HISTORY);
+    public static FifoQueue FOREGROUND_SCORE = new FifoQueue(Constants.FOREGROUND_SCORING_HISTORY);
+    public static FifoQueue LOCATION_SCORE = new FifoQueue(Constants.LOCATION_SCORING_HISTORY);
+    public static FifoQueue SCREEN_SCORE = new FifoQueue(Constants.SCREEN_SCORING_HISTORY);
+
+    public static Integer CUMULATIVE_SCORE = 0;
 
     private static String mLogTag = "ScoringService";
 
@@ -306,6 +308,8 @@ public class ScoringService extends Service {
     private void calculateCumulativeScore() {
         // use the static scores
         Log.i(mLogTag, "Calculate cumulative score");
+        CUMULATIVE_SCORE = generateRandomNumber();
+        SensorDataDumperActivity.mSensorDataDumperActivity.setCumulativeScore();
     }
 
     private void calculateAccelerometerScore() {
@@ -419,7 +423,8 @@ public class ScoringService extends Service {
                 if (ViewCameraPicturesActivity.mSharedViewCameraPicturesActivity != null) {
                     Arrays.sort(frontPictures);
                     File file = frontPictures[frontPictures.length - 1];
-                    ImageViewer iv = new ImageViewer(file, 40, 20, 300, 300);
+                    // calculate bounding box on image...
+                    ImageViewer iv = new ImageViewer(file, 40, 20, 300, 300); // image file, x, y, width, height
                     ViewCameraPicturesActivity.mSharedViewCameraPicturesActivity.postImage(iv);
                 }
             } else {

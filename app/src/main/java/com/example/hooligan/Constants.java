@@ -62,7 +62,7 @@ public class Constants {
     public static int SCREEN_WINDOW_SIZE = 10;
 
     /**
-     * Scoring
+     * Scoring milliseconds
      */
     public static int ACCLEROMETER_SCORING_RATE = 5000;
     public static int AIR_PRESSURE_SCORING_RATE = 5000;
@@ -80,7 +80,29 @@ public class Constants {
     public static int FOREGROUND_SCORING_RATE = 5000;
     public static int LOCATION_SCORING_RATE = 5000;
     public static int SCREEN_SCORING_RATE = 5000;
+
     public static int CUMULATIVE_SCORING_RATE = 10000;
+
+    /**
+     * Scoring history
+     */
+
+    public static int ACCELEROMETER_SCORING_HISTORY = 5;
+    public static int AIR_PRESSURE_SCORING_HISTORY = 5;
+    public static int AMBIENT_LIGHT_SCORING_HISTORY = 5;
+    public static int MAGNETIC_SCORING_HISTORY = 5;
+    public static int PROXIMITY_SCORING_HISTORY = 5;
+    public static int ROTATION_SCORING_HISTORY = 5;
+    public static int TEMPERATURE_SCORING_HISTORY = 5;
+    public static int CALL_SCORING_HISTORY = 5;
+    public static int BATTERY_SCORING_HISTORY = 5;
+    public static int CAMERA_SCORING_HISTORY = 5;
+    public static int WIFI_SCORING_HISTORY = 5;
+    public static int CELLULAR_SCORING_HISTORY = 5;
+    public static int BLUETOOTH_SCORING_HISTORY = 5;
+    public static int FOREGROUND_SCORING_HISTORY = 5;
+    public static int LOCATION_SCORING_HISTORY = 5;
+    public static int SCREEN_SCORING_HISTORY = 5;
 
     /**
      * Directory names
